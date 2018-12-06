@@ -12,7 +12,8 @@
                 "${file}"
             ],
             "cwd": "${workspaceRoot}",
-            "stopAtEntry": true
+            "stopAtEntry": true,
+            "requireExactSource": false
         }
     ]
 }
