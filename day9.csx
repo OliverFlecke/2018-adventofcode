@@ -3,60 +3,62 @@
 int players = 424;
 int last = 71144;
 
-void printList(int currentMarble, List<int> marbles, int i)
+void printList(LinkedListNode<int> currentMarble, LinkedList<int> marbles, int i)
 {
     Console.Write("[{0}] ", i % players);
     for (int j = 0; j < marbles.Count; j++)
     {
-        if (j == currentMarble)
+        var marble = marbles.ElementAt(j);
+        if (marble == currentMarble.Value)
         {
-            Console.Write("({0}) ", marbles[j]);
+            Console.Write("({0}) ", marble);
         }
         else
         {
-            Console.Write("{0} ", marbles[j]);
+            Console.Write("{0} ", marble);
         }
     }
     Console.WriteLine();
 }
 
 
-List<int> marbles = new List<int>();
-marbles.Capacity = last - last / 23 + 100;
-marbles.Add(0);
+LinkedList<int> marbles = new LinkedList<int>();
+LinkedListNode<int> node = marbles.AddFirst(0);
 
-int currentMarble = 1;
-Dictionary<int, int> scores = new Dictionary<int, int>();
+Dictionary<int, long> scores = new Dictionary<int, long>();
 for (int i = 0; i < players; i++)
 {
     scores.Add(i, 0);
 }
 
-Console.WriteLine("Starting game");
 for (int i = 1; i <= last * 100; i++)
 {
     if (i % 23 != 0)
     {
-        currentMarble = (currentMarble + 1) % (marbles.Count) + 1;
-        marbles.Insert(currentMarble, i);
+        node = marbles.AddAfter(node.Next == null ? marbles.First : node.Next, i);
     }
     else
     {
-        currentMarble = ((currentMarble - 7) + marbles.Count) % (marbles.Count);
-        scores[i % players] += marbles[currentMarble] + i;
-        marbles.RemoveAt(currentMarble);
+        for (int r = 0; r < 7; r++)
+        {
+            if (node.Previous != null)
+            {
+
+                node = node.Previous;
+            }
+            else
+            {
+                node = marbles.Last;
+            }
+        }
+        scores[i % players] += node.Value + i;
+        var temp = node;
+        node = temp.Next;
+        marbles.Remove(temp);
     }
 
 
-    // printList(currentMarble, marbles, i);
-    if (i % last == 0)
-    {
-        Console.WriteLine("i at {0} ({1}%)", i, i / last);
-    }
+    // printList(node, marbles, i);
 }
 
-// Console.WriteLine();
-// Console.WriteLine(String.Join(" ", marbles));
-
-// Console.WriteLine(String.Join(" ", scores.Values));
 Console.WriteLine("Max {0}", scores.Values.Max());
